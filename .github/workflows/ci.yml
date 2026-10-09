@@ -18,6 +18,8 @@ jobs:
           cache: pip
       - name: Install package build tools
         run: python -m pip install --upgrade pip build
+      - name: Install project for tests
+        run: python -m pip install --no-deps -e .
       - name: Test and compile
         env:
           REPROPACK_CORE: ${{ github.workspace }}/repropack-core
