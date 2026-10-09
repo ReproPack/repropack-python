@@ -8,5 +8,8 @@ version = "0.1.0"
 description = "Native Python implementation of the ReproPack 0.1 format"
 requires-python = ">=3.11"
 
+[tool.setuptools.packages.find]
+where = ["src"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]

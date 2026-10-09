@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 import tempfile
 import unittest
@@ -9,7 +10,7 @@ import zipfile
 
 from repropack import Manifest, ReproPackError, create_bundle, default_limits, extract_bundle, read_bundle, redact_bytes, redact_manifest_entry, sha256, verify_bundle
 
-CORE = Path(__file__).parents[2] / "repropack-core"
+CORE = Path(os.environ.get("REPROPACK_CORE", Path(__file__).parents[2] / "repropack-core"))
 FIXTURES = CORE / "conformance" / "fixtures"
 
 
