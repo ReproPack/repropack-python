@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "repropack"
-version = "0.1.0"
+version = "0.1.1"
 description = "Native Python implementation of the ReproPack 0.1 format"
 requires-python = ">=3.11"
 
