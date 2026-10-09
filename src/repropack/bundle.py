@@ -6,6 +6,7 @@ from pathlib import Path
 import os
 import stat
 import zipfile
+import zlib
 from typing import Mapping
 
 from .model import Manifest, ReadLimits, ReproPackError, default_limits, sha256
@@ -70,7 +71,7 @@ def read_bundle(data: bytes, limits: ReadLimits | None = None) -> Bundle:
             total += info.file_size
             if total > limits.max_total_bytes: raise ReproPackError("limit-exceeded", "total bytes")
             try: content = archive.read(info)
-            except (zipfile.BadZipFile, RuntimeError, ValueError) as error: raise ReproPackError("malformed-archive", name) from error
+            except (zipfile.BadZipFile, RuntimeError, ValueError, zlib.error, EOFError) as error: raise ReproPackError("malformed-archive", name) from error
             if name == MANIFEST_PATH:
                 if len(content) > limits.max_manifest_bytes: raise ReproPackError("limit-exceeded", "manifest bytes")
                 manifest_bytes = content

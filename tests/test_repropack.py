@@ -4,6 +4,8 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from io import BytesIO
+import zipfile
 
 from repropack import Manifest, ReproPackError, create_bundle, default_limits, extract_bundle, read_bundle, redact_bytes, redact_manifest_entry, sha256, verify_bundle
 
@@ -58,6 +60,21 @@ class ReproPackTests(unittest.TestCase):
             extract_bundle(bundle, directory)
             self.assertEqual((Path(directory) / "message.txt").read_bytes(), b"ReproPack minimal evidence.\n")
         self.assertEqual(default_limits().max_entry_bytes, 256 * 1024 * 1024)
+
+    def test_malformed_archive_and_limits(self) -> None:
+        with self.assertRaises(ReproPackError) as raised:
+            read_bundle(b"not a zip")
+        self.assertEqual(raised.exception.code, "malformed-archive")
+        manifest, evidence = fixture("minimal-valid")
+        with self.assertRaises(ReproPackError) as raised:
+            read_bundle(create_bundle(manifest, evidence), type(default_limits())(max_manifest_bytes=1))
+        self.assertEqual(raised.exception.code, "limit-exceeded")
+        stream = BytesIO()
+        with zipfile.ZipFile(stream, "w") as archive:
+            archive.writestr("evidence/../escape.txt", b"x")
+        with self.assertRaises(ReproPackError) as raised:
+            read_bundle(stream.getvalue())
+        self.assertEqual(raised.exception.code, "unsafe-path")
 
 
 if __name__ == "__main__": unittest.main()
