@@ -1,9 +1,9 @@
 # Project state
 
-- Current phase: Phase 2 - implementation planning
-- Phase status: waiting on native implementation work; Phase 1 specification adoption complete by project-owner approval
-- Specification implemented: none; canonical version is 0.1 approved for implementation
-- Implementation status: no SDK, CLI, tests, fixtures, or package released
-- Conformance status: canonical fixtures exist in core; Python has not passed them
-- Known environment issue: Python executable was inaccessible in the audit session
-- Next action: track the Rust model contract, then implement the native Python model after shared conformance requirements are available
+- Current phase: Phase 2 - native manifest and bundle operations
+- Phase status: in progress; implementation is present but execution validation is blocked
+- Specification implemented: native 0.1 model and standard-library bundle operations; canonical version is 0.1 approved for implementation
+- Implementation status: native package, validation, ZIP I/O, redaction, verification, safe extraction, and unittest suite implemented; no package released
+- Conformance status: tests target all 12 core fixtures but have not run in this session
+- Known environment issue: no usable Python executable is installed or accessible; WindowsApps aliases are disabled
+- Next action: run `python -m unittest discover -s tests -v` after Python is available, then complete local Phase 2 and Phase 3 conformance

@@ -6,13 +6,13 @@ This roadmap tracks work owned by the native Python repository. Canonical phase 
 
 **Complete** means all acceptance criteria have evidence. **In progress** means work has started but exit criteria remain. **Not started** means dependencies are unmet. **Blocked** means a specific blocker is recorded in `PROJECT_STATE.md`. **Deferred** means intentionally postponed.
 
-Current status: **Phase 1 complete by project-owner approval; local Phase 2 not started**.
+Current status: **Local Phase 2 in progress; validation blocked by unavailable Python executable**.
 
 | Local phase | Status | Dependencies | Deliverables | Acceptance / exit criteria |
 |---|---|---|---|---|
 | 0 — Repository foundation | **Complete** | None | Independent repository, policies, context, roadmap, CI scaffold | Required docs exist, no SDK claims, pushed commit verified |
 | 1 — Specification adoption | **Complete** | Core Phase 1 | Pin reviewed core revision; map manifest, exceptions, paths, limits, timestamps; add `docs/SPECIFICATION_MAPPING.md` | Mapping exists and owner approval is recorded |
-| 2 — Native manifest and bundle operations | **Not started** | Local Phase 1 | Native models, JSON validation, archive create/read, inspect, validate, verify, extract | Supported Python checks and tests pass without Rust |
+| 2 — Native manifest and bundle operations | **In progress** | Local Phase 1 | Native models, JSON validation, archive create/read, inspect, validate, verify, extract | Supported Python checks and tests pass without Rust |
 | 3 — Shared conformance | **Not started** | Core Phase 5, Local Phase 2 | Fixture runner and semantic assertions | All applicable canonical fixtures pass with expected failures |
 | 4 — Interoperability and security | **Not started** | Core Phases 7–9, Local Phase 3 | Cross-language paths and malformed-input tests | Semantics agree; security evidence is recorded |
 | 5 — Usability, CI, and release | **Not started** | Local Phase 4, Core Phases 10–14 | SDK docs, optional CLI, CI, package build, audit inputs | Clean examples, package validation, and checklist pass |
@@ -25,11 +25,11 @@ Current status: **Phase 1 complete by project-owner approval; local Phase 2 not 
 
 ### Phase 1 — Specification adoption
 
-**Status:** In progress. The core v0.1 draft, schema, semantic fixtures, and `docs/SPECIFICATION_MAPPING.md` now exist. Pin the reviewed core revision and complete independent review. **Exit:** two reviewers confirm implementation is possible without Rust.
+**Status:** Complete by project-owner approval. The core v0.1 draft, schema, semantic fixtures, and `docs/SPECIFICATION_MAPPING.md` are adopted.
 
 ### Phase 2 — Native manifest and bundle operations
 
-**Status:** Not started. Implement construction, serialization, archive I/O, validation, SHA-256 verification, safe extraction, and exceptions using idiomatic Python and the standard library where practical. Test round trips, malformed JSON, duplicate/unsafe paths, limits, altered content, and no execution. **Exit:** formatting, lint/type checks where selected, unit, and integration tests pass.
+**Status:** In progress. Native construction, serialization, archive I/O, validation, SHA-256 verification, redaction, safe extraction, exceptions, and tests are implemented in `src/repropack` and `tests`. **Exit:** remains open until a supported Python interpreter runs the test suite; see `docs/PHASE_2_REVIEW.md`.
 
 ### Phase 3 — Shared conformance
 
