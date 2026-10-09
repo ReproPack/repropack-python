@@ -20,7 +20,14 @@ class RedactionResult:
 def redact_text(value: str) -> RedactionResult:
     output: list[str] = []; warnings: list[RedactionWarning] = []; private_key = False; redacted = False
     for line in value.splitlines(keepends=True):
-        content = line[:-1] if line.endswith("\n") else line; newline = "\n" if line.endswith("\n") else ""
+        if line.endswith("\r\n"):
+            content, newline = line[:-2], "\r\n"
+        elif line.endswith("\n"):
+            content, newline = line[:-1], "\n"
+        elif line.endswith("\r"):
+            content, newline = line[:-1], "\r"
+        else:
+            content, newline = line, ""
         if private_key:
             redacted = True
             if "-----END " in content and content.endswith("PRIVATE KEY-----"): private_key = False

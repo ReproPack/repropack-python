@@ -13,6 +13,7 @@ _TIMESTAMP = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?Z$")
 _PATH = re.compile(r"^evidence/[A-Za-z0-9._~-]+(?:/[A-Za-z0-9._~-]+)*$")
 _MEDIA = re.compile(r"^[a-z0-9!#$%&'*+.^_`|~-]+/[a-z0-9!#$%&'*+.^_`|~-]+$")
 _DIGEST = re.compile(r"^[0-9a-f]{64}$")
+_URI = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*:[^\s]+$")
 _KINDS = {"log", "text", "structured", "source", "environment", "test-output", "file"}
 _SELECTIONS = {"explicit", "generated", "derived"}
 _REASONS = {"secret", "personal-data", "user-requested", "policy"}
@@ -112,18 +113,30 @@ class Manifest:
         if capture["mode"] not in {"explicit", "generated"}: raise ReproPackError("invalid-manifest", "invalid capture mode")
         tool = _object(capture["tool"], "capture.tool")
         _exact(tool, {"name", "version"}, "capture.tool")
-        if not isinstance(tool.get("name"), str) or not tool["name"] or not isinstance(tool.get("version"), str) or not tool["version"]: raise ReproPackError("invalid-manifest", "invalid capture tool")
+        if not isinstance(tool.get("name"), str) or not tool["name"] or len(tool["name"]) > 128 or not isinstance(tool.get("version"), str) or not tool["version"] or len(tool["version"]) > 64: raise ReproPackError("invalid-manifest", "invalid capture tool")
+        if "actor" in capture and (not isinstance(capture["actor"], str) or len(capture["actor"]) > 256): raise ReproPackError("invalid-manifest", "invalid capture actor")
+        if "source" in capture and (not isinstance(capture["source"], str) or len(capture["source"]) > 512): raise ReproPackError("invalid-manifest", "invalid capture source")
+        if "incident" in root:
+            incident = _object(root["incident"], "incident")
+            _exact(incident, {"title", "summary", "category", "reported_at"}, "incident")
+            if "title" in incident and (not isinstance(incident["title"], str) or len(incident["title"]) > 256): raise ReproPackError("invalid-manifest", "invalid incident title")
+            if "summary" in incident and (not isinstance(incident["summary"], str) or len(incident["summary"]) > 8192): raise ReproPackError("invalid-manifest", "invalid incident summary")
+            if "category" in incident and (not isinstance(incident["category"], str) or len(incident["category"]) > 128): raise ReproPackError("invalid-manifest", "invalid incident category")
+            if "reported_at" in incident:
+                if not isinstance(incident["reported_at"], str) or not _TIMESTAMP.fullmatch(incident["reported_at"]): raise ReproPackError("invalid-manifest", "invalid incident timestamp")
+                try: datetime.fromisoformat(incident["reported_at"].replace("Z", "+00:00"))
+                except ValueError as error: raise ReproPackError("invalid-manifest", "invalid incident timestamp") from error
         extensions = root.get("extensions")
         if extensions is not None:
             extensions = _object(extensions, "extensions")
-            if any(":" not in key or any(character.isspace() for character in key) for key in extensions): raise ReproPackError("invalid-manifest", "invalid extension")
+            if any(not _URI.fullmatch(key) for key in extensions): raise ReproPackError("invalid-manifest", "invalid extension")
         if not isinstance(root["evidence"], list) or not root["evidence"]: raise ReproPackError("invalid-manifest", "evidence must not be empty")
         entries = [EvidenceEntry.from_dict(raw, index) for index, raw in enumerate(root["evidence"])]
         paths: set[str] = set(); previous = ""
         for index, entry in enumerate(entries):
             if not isinstance(entry.path, str) or not _PATH.fullmatch(entry.path) or ".." in entry.path.split("/") or entry.path in paths or entry.path <= previous: raise ReproPackError("unsafe-path" if ".." in entry.path.split("/") else "invalid-manifest", f"invalid evidence path at {index}")
             paths.add(entry.path); previous = entry.path
-            if entry.kind not in _KINDS or not isinstance(entry.media_type, str) or not _MEDIA.fullmatch(entry.media_type): raise ReproPackError("invalid-manifest", f"invalid evidence metadata at {index}")
+            if entry.kind not in _KINDS or not isinstance(entry.media_type, str) or len(entry.media_type) > 255 or not _MEDIA.fullmatch(entry.media_type): raise ReproPackError("invalid-manifest", f"invalid evidence metadata at {index}")
             if not isinstance(entry.size, int) or isinstance(entry.size, bool) or entry.size < 0 or entry.size > limits.max_entry_bytes: raise ReproPackError("limit-exceeded", f"evidence size at {index}")
             if not isinstance(entry.sha256, str) or not _DIGEST.fullmatch(entry.sha256): raise ReproPackError("invalid-manifest", f"invalid digest at {index}")
             if entry.selection not in _SELECTIONS: raise ReproPackError("invalid-manifest", f"invalid selection at {index}")

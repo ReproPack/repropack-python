@@ -10,3 +10,4 @@
 - Release baseline: synchronized `main` is `075322861dca89ee2497f009778a420373ee47cf`; target is local `v0.1.1`; local annotated `v0.1.0` still targets `bd48963ac6a77a8ed72adf48e036251fe5084712`; no remote tag or GitHub Release exists
 - Registry decision: local wheel/sdist exist, but clean-environment installation and publisher/name verification remain required before PyPI publication
 - Owner decisions: preserve the old local tag and release `0.1.1`, or explicitly confirm no external consumption and recreate `v0.1.0`; PyPI publication requires owner approval and project-name/publisher confirmation
+- Full organization audit: local branch `audit/full-repropack-2026-10-09` contains security, schema-validation, CRLF-redaction, and cross-branch CI corrections. The canonical report is [AUDIT_REPORT.md](https://github.com/ReproPack/repropack-core/blob/audit/full-repropack-2026-10-09/AUDIT_REPORT.md); hosted audit-branch CI and PR review remain pending.
