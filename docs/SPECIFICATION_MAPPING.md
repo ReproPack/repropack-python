@@ -1,6 +1,6 @@
 # Python mapping for ReproPack 0.1
 
-This is an implementation design artifact for Phase 1. It does not claim that the SDK exists.
+This document maps the implemented native Python SDK to ReproPack 0.1.
 
 | Specification concept | Python mapping | Required behavior |
 |---|---|---|
@@ -14,4 +14,4 @@ This is an implementation design artifact for Phase 1. It does not claim that th
 | Unknown version | `UnsupportedVersionError` / `unsupported-version` code | Reject before using evidence |
 | Safe extraction | destination-root checked `pathlib` operation | Reject links and special files; never execute entries |
 
-The implementation must use native Python and the standard library where practical; it must not invoke or link to Rust. The mapping is ready for Phase 2 after independent review of the canonical specification.
+The implementation uses native Python and the standard library where practical; it does not invoke or link to Rust. Current fixture and interoperability evidence covers this implementation; it does not certify future integrations or every possible input.

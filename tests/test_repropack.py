@@ -49,6 +49,30 @@ class ReproPackTests(unittest.TestCase):
         result = redact_manifest_entry(manifest, "evidence/message.txt", b"api_key=secret-value\n", "secret")
         self.assertEqual(manifest.evidence[0].size, len(result.data)); self.assertEqual(manifest.evidence[0].sha256, sha256(result.data)); Manifest.from_dict(manifest.to_dict())
 
+    def test_crlf_private_key_redaction(self) -> None:
+        result = redact_bytes(b"-----BEGIN PRIVATE KEY-----\r\nsecret-body\r\n-----END PRIVATE KEY-----\r\n")
+        self.assertTrue(result.redacted)
+        self.assertEqual(result.data, b"[REDACTED]\r\n[REDACTED]\r\n[REDACTED]\r\n")
+        self.assertNotIn(b"secret-body", result.data)
+
+    def test_nested_schema_validation_and_strict_timestamp_uri_rules(self) -> None:
+        manifest = {
+            "format": "repropack", "spec_version": "0.1", "bundle_id": "11111111-1111-4111-8111-111111111111", "created_at": "2026-01-01T00:00:00Z",
+            "capture": {"mode": "explicit", "tool": {"name": "tool", "version": "1"}},
+            "evidence": [{"path": "evidence/a.txt", "kind": "text", "media_type": "text/plain", "size": 0, "sha256": "0" * 64, "selection": "explicit", "redaction": {"status": "none"}}],
+        }
+        for incident in (None, "wrong", []):
+            manifest["incident"] = incident
+            with self.assertRaises(ReproPackError): Manifest.from_dict(manifest)
+        manifest["incident"] = {"title": "ok", "unknown": True}
+        with self.assertRaises(ReproPackError): Manifest.from_dict(manifest)
+        manifest.pop("incident")
+        manifest["extensions"] = {"not a URI": True}
+        with self.assertRaises(ReproPackError): Manifest.from_dict(manifest)
+        manifest.pop("extensions")
+        manifest["created_at"] = "2026-02-30T00:00:00Z"
+        with self.assertRaises(ReproPackError): Manifest.from_dict(manifest)
+
     def test_binary_warning(self) -> None:
         result = redact_bytes(b"\x00\xffsecret")
         self.assertEqual(result.data, b"\x00\xffsecret"); self.assertEqual(result.warnings[0].kind, "binary-input-not-scanned")
