@@ -12,7 +12,7 @@
   <a href="https://github.com/ReproPack/repropack-core/blob/main/docs/SPECIFICATION.md"><img src="https://img.shields.io/badge/spec-ReproPack%200.1-6b4fbb.svg" alt="ReproPack format 0.1"></a>
 </p>
 
-This implementation uses the Python standard library to validate manifests, create and read stored-ZIP bundles, verify evidence, apply explicit redactions, and extract safely. It does not import or execute Rust.
+This is an independent Python implementation of the ReproPack contract. It uses the standard library to validate manifests, create and read stored-ZIP bundles, verify evidence, apply explicit redactions, and extract safely. It does not import or execute Rust.
 
 ## What you get
 
@@ -22,7 +22,7 @@ This implementation uses the Python standard library to validate manifests, crea
 - explicit redaction helpers with advisory warnings;
 - shared semantic fixtures used by the ReproPack ecosystem.
 
-The canonical specification lives in [repropack-core](https://github.com/ReproPack/repropack-core/blob/main/docs/SPECIFICATION.md). The intended distribution name is `repropack`; registry publication remains a separate release decision.
+The canonical specification, schema, fixtures, and release policy live in [repropack-core](https://github.com/ReproPack/repropack-core). The intended distribution name is `repropack`; registry publication remains a separate release decision. This repository is the Python SDK and implementation, not a second specification.
 
 ## Quick start
 
@@ -37,6 +37,8 @@ python -m pip install --upgrade pip
 python -m pip install .
 python -m unittest discover -s tests -v
 ```
+
+For a CI failure-capture workflow, use the Core [integration example](https://github.com/ReproPack/repropack-core/blob/main/docs/CI_INTEGRATION.md) and adapt only the explicitly selected evidence files.
 
 The SDK is exported from the `repropack` package. Build distribution artifacts with:
 
