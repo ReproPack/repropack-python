@@ -48,6 +48,8 @@ python -m build
 
 For the format walkthrough, see the Core [tutorial](https://github.com/ReproPack/repropack-core/blob/main/docs/TUTORIAL.md).
 
+The v0.1.1 wheel and source distribution are available in the [GitHub Release](https://github.com/ReproPack/repropack-python/releases/tag/v0.1.1). PyPI publication remains a separate owner-controlled action.
+
 ## Project map
 
 | Need | Start here |
