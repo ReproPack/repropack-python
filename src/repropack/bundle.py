@@ -13,6 +13,7 @@ from .model import Manifest, ReadLimits, ReproPackError, default_limits, sha256
 
 MANIFEST_PATH = "manifest.json"
 EVIDENCE_PREFIX = "evidence/"
+_READ_CHUNK_BYTES = 64 * 1024
 
 
 @dataclass
@@ -51,6 +52,28 @@ def create_bundle(manifest: Manifest, evidence: Mapping[str, bytes]) -> bytes:
     return stream.getvalue()
 
 
+def _read_entry_chunks(archive: zipfile.ZipFile, info: zipfile.ZipInfo, limit: int, name: str) -> bytes:
+    """Read an entry in bounded chunks while retaining only the public bytes result."""
+    output = bytearray()
+    try:
+        with archive.open(info, "r") as source:
+            while True:
+                remaining = limit + 1 - len(output)
+                if remaining <= 0:
+                    raise ReproPackError("limit-exceeded", name)
+                chunk = source.read(min(_READ_CHUNK_BYTES, remaining))
+                if not chunk:
+                    break
+                output.extend(chunk)
+    except ReproPackError:
+        raise
+    except (zipfile.BadZipFile, RuntimeError, ValueError, zlib.error, EOFError, OSError) as error:
+        raise ReproPackError("malformed-archive", name) from error
+    if len(output) > limit:
+        raise ReproPackError("limit-exceeded", name)
+    return bytes(output)
+
+
 def read_bundle(data: bytes, limits: ReadLimits | None = None) -> Bundle:
     limits = limits or default_limits()
     from io import BytesIO
@@ -70,8 +93,7 @@ def read_bundle(data: bytes, limits: ReadLimits | None = None) -> Bundle:
             if info.file_size > limits.max_entry_bytes: raise ReproPackError("limit-exceeded", name)
             total += info.file_size
             if total > limits.max_total_bytes: raise ReproPackError("limit-exceeded", "total bytes")
-            try: content = archive.read(info)
-            except (zipfile.BadZipFile, RuntimeError, ValueError, zlib.error, EOFError) as error: raise ReproPackError("malformed-archive", name) from error
+            content = _read_entry_chunks(archive, info, limits.max_manifest_bytes if name == MANIFEST_PATH else limits.max_entry_bytes, name)
             if name == MANIFEST_PATH:
                 if len(content) > limits.max_manifest_bytes: raise ReproPackError("limit-exceeded", "manifest bytes")
                 manifest_bytes = content

@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
+import random
 import tempfile
 import unittest
 from io import BytesIO
@@ -100,6 +101,34 @@ class ReproPackTests(unittest.TestCase):
         with self.assertRaises(ReproPackError) as raised:
             read_bundle(stream.getvalue())
         self.assertEqual(raised.exception.code, "unsafe-path")
+
+    def test_deterministic_malformed_inputs_are_rejected(self) -> None:
+        generator = random.Random(0x5EED)
+        for length in range(512):
+            candidate = bytes(generator.randrange(256) for _ in range(length))
+            with self.subTest(length=length):
+                with self.assertRaises(ReproPackError):
+                    read_bundle(candidate)
+
+    def test_encrypted_entry_flag_is_rejected_before_content_use(self) -> None:
+        manifest, evidence = fixture("minimal-valid")
+        archive = bytearray(create_bundle(manifest, evidence))
+        local = archive.find(b"PK\x03\x04")
+        central = archive.find(b"PK\x01\x02")
+        self.assertGreaterEqual(local, 0)
+        self.assertGreaterEqual(central, 0)
+        archive[local + 6:local + 8] = (int.from_bytes(archive[local + 6:local + 8], "little") | 1).to_bytes(2, "little")
+        archive[central + 8:central + 10] = (int.from_bytes(archive[central + 8:central + 10], "little") | 1).to_bytes(2, "little")
+        with self.assertRaises(ReproPackError) as raised:
+            read_bundle(bytes(archive))
+        self.assertEqual(raised.exception.code, "encrypted-entry")
+
+    def test_compression_bomb_sized_entry_is_rejected_before_inflation(self) -> None:
+        manifest, _ = fixture("minimal-valid")
+        evidence = {"evidence/message.txt": b"x" * (1024 * 1024)}
+        with self.assertRaises(ReproPackError) as raised:
+            read_bundle(create_bundle(manifest, evidence), type(default_limits())(max_entry_bytes=4096))
+        self.assertEqual(raised.exception.code, "limit-exceeded")
 
 
 if __name__ == "__main__": unittest.main()
