@@ -24,6 +24,8 @@ This is an independent Python implementation of the ReproPack contract. It uses 
 
 The canonical specification, schema, fixtures, and release policy live in [repropack-core](https://github.com/ReproPack/repropack-core). The intended distribution name is `repropack`; registry publication remains a separate release decision. This repository is the Python SDK and implementation, not a second specification.
 
+For the project map, evidence boundaries, and future contributor work packages, start with the [Core project overview](https://github.com/ReproPack/repropack-core/blob/main/docs/PROJECT_OVERVIEW.md).
+
 ## Quick start
 
 Create an isolated environment and install the project locally:
