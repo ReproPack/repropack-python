@@ -1,18 +1,24 @@
 # ReproPack for Python
 
-<p align="center">
-  <img src="docs/architecture.svg" alt="ReproPack Python implementation architecture" width="900">
-</p>
-
-<p align="center"><strong>Native Python support for the language-neutral ReproPack evidence-bundle format.</strong></p>
+<p align="center"><img src="assets/hero-v0.1.1.svg" alt="ReproPack Python: native Python adapter for independent lifecycle evidence" width="100%"></p>
 
 <p align="center">
   <a href="https://github.com/ReproPack/repropack-python/actions/workflows/ci.yml"><img src="https://github.com/ReproPack/repropack-python/actions/workflows/ci.yml/badge.svg" alt="Python CI"></a>
+  <a href="https://img.shields.io/badge/runtime-Python%203.11%2B-2f6f9f"><img src="https://img.shields.io/badge/runtime-Python%203.11%2B-2f6f9f" alt="Python 3.11 and newer"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-2f6f9f.svg" alt="MIT license"></a>
-  <a href="https://github.com/ReproPack/repropack-core/blob/main/docs/SPECIFICATION.md"><img src="https://img.shields.io/badge/spec-ReproPack%200.1-6b4fbb.svg" alt="ReproPack format 0.1"></a>
+  <a href="https://pypi.org/project/repropack/"><img src="https://img.shields.io/pypi/v/repropack" alt="PyPI version"></a>
+  <a href="https://img.shields.io/badge/status-v0.1.1%20released-2ea44f"><img src="https://img.shields.io/badge/status-v0.1.1%20released-2ea44f" alt="v0.1.1 released"></a>
 </p>
 
-This is an independent Python implementation of the ReproPack contract. It uses the standard library to validate manifests, create and read stored-ZIP bundles, verify evidence, apply explicit redactions, and extract safely. It does not import or execute Rust.
+ReproPack for Python is a native standard-library implementation for validating manifests, creating and reading stored-ZIP evidence bundles, verifying integrity, applying explicit redactions, and extracting safely.
+
+## Repository role
+
+This repository is the Python implementation and adapter. It owns the Python package, models, archive operations, integrity checks, redaction helpers, safe extraction, and implementation-level tests. The canonical format remains in [repropack-core](https://github.com/ReproPack/repropack-core).
+
+## Architecture
+
+<p align="center"><img src="docs/architecture.svg" alt="ReproPack Python implementation architecture" width="900"></p>
 
 ## What you get
 
@@ -22,11 +28,9 @@ This is an independent Python implementation of the ReproPack contract. It uses 
 - explicit redaction helpers with advisory warnings;
 - shared semantic fixtures used by the ReproPack ecosystem.
 
-The canonical specification, schema, fixtures, and release policy live in [repropack-core](https://github.com/ReproPack/repropack-core). The intended distribution name is `repropack`; registry publication remains a separate release decision. This repository is the Python SDK and implementation, not a second specification.
+The SDK consumes the Core specification and shared fixtures independently. Conformance evidence covers the current contract; it does not certify future integrations or arbitrary external consumers.
 
-For the project map, evidence boundaries, and future contributor work packages, start with the [Core project overview](https://github.com/ReproPack/repropack-core/blob/main/docs/PROJECT_OVERVIEW.md).
-
-## Quick start
+## Quickstart
 
 Create an isolated environment and install the project locally:
 
@@ -40,7 +44,7 @@ python -m pip install .
 python -m unittest discover -s tests -v
 ```
 
-For a CI failure-capture workflow, use the Core [integration example](https://github.com/ReproPack/repropack-core/blob/main/docs/CI_INTEGRATION.md) and adapt only the explicitly selected evidence files.
+For a CI failure-capture workflow, use the Core [integration example](https://github.com/ReproPack/repropack-core/blob/main/docs/CI_INTEGRATION.md) and adapt only explicitly selected evidence files.
 
 The SDK is exported from the `repropack` package. Build distribution artifacts with:
 
@@ -50,9 +54,7 @@ python -m build
 
 For the format walkthrough, see the Core [tutorial](https://github.com/ReproPack/repropack-core/blob/main/docs/TUTORIAL.md).
 
-The v0.1.1 wheel and source distribution are available in the [GitHub Release](https://github.com/ReproPack/repropack-python/releases/tag/v0.1.1). PyPI publication remains a separate owner-controlled action.
-
-## Project map
+## Documentation and status
 
 | Need | Start here |
 | --- | --- |
@@ -65,8 +67,16 @@ The v0.1.1 wheel and source distribution are available in the [GitHub Release](h
 
 ## Status
 
-The current implementation passes the shared semantic fixtures and the coordinated cross-language interoperability matrix. Future integrations and PyPI publication are not implied by that result.
+v0.1.1 is released on GitHub and `repropack==0.1.1` is publicly available on PyPI. Future integrations remain outside the current package contract.
 
-## License
+## Related repositories
 
-MIT. See [LICENSE](LICENSE).
+| Repository | Role | Link |
+| --- | --- | --- |
+| **repropack-core** | Specification, schema, fixtures, Rust reference model, and CLI | [Core](https://github.com/ReproPack/repropack-core) |
+| **repropack-typescript** | Native Node.js SDK and adapter | [TypeScript](https://github.com/ReproPack/repropack-typescript) |
+| **repropack-python** | Native Python SDK and adapter | This repository |
+
+## Project links
+
+[License](LICENSE) · [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md) · [Code of Conduct](CODE_OF_CONDUCT.md) · [Changelog](CHANGELOG.md) · [Support](SUPPORT.md)
