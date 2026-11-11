@@ -16,6 +16,12 @@ ReproPack for Python is a native standard-library implementation for validating 
 
 This repository is the Python implementation and adapter. It owns the Python package, models, archive operations, integrity checks, redaction helpers, safe extraction, and implementation-level tests. The canonical format remains in [repropack-core](https://github.com/ReproPack/repropack-core).
 
+## Scope and boundaries
+
+Use this package when a Python tool needs to create or inspect a bounded, portable record of explicitly selected failure evidence. A bundle contains format metadata, selected bytes, provenance, integrity digests, limits, and redaction state.
+
+The package does not collect an entire workspace automatically, reconstruct dependencies or a runtime, replay a failure, guarantee secret removal, or execute bundle contents. Passing conformance checks applies to the recorded implementation and fixtures; it is not a certification of arbitrary integrations or future consumers.
+
 ## Architecture
 
 <p align="center"><img src="docs/architecture.svg" alt="ReproPack Python implementation architecture" width="900"></p>
@@ -29,6 +35,10 @@ This repository is the Python implementation and adapter. It owns the Python pac
 - shared semantic fixtures used by the ReproPack ecosystem.
 
 The SDK consumes the Core specification and shared fixtures independently. Conformance evidence covers the current contract; it does not certify future integrations or arbitrary external consumers.
+
+## Interoperability and safe sharing
+
+The implementation participates in the recorded Phase 8 matrix with Rust and TypeScript for the minimal and redacted fixtures. The matrix compares normalized manifest meaning, evidence bytes, sizes, hashes, redaction markers, and expected error categories. Before sharing a bundle, select inputs explicitly, review paths and provenance, apply deliberate redaction, verify integrity, and treat all metadata and evidence as untrusted.
 
 ## Quickstart
 
